@@ -1,3 +1,6 @@
+pub mod index;
+pub mod index_builder;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
