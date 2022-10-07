@@ -1,4 +1,4 @@
-use elastic4forensics::index_builder::{IndexBuilder, WithHost};
+use elastic4forensics::{IndexBuilder, WithHost};
 use elasticsearch::auth::Credentials;
 mod common;
 
@@ -14,7 +14,7 @@ async fn test_index_creation() -> Result<(), Box<dyn std::error::Error>> {
         .with_credentials(credentials)
     ;
         
-    if let Err(e) = builder.create_if_not_exists().await { panic!("{e}") }
+    if let Err(e) = builder.build().await { panic!("{e}") }
 
     assert!(builder.index_exists().await?);
     Ok(())

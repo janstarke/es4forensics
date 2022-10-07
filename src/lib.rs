@@ -1,17 +1,14 @@
-pub mod index;
-pub mod index_builder;
+mod index;
+mod index_builder;
+mod timestamp;
+mod evidence_item_v1;
+mod evidence_object_v1;
+mod utils;
+mod ecs;
+pub mod objects;
 
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use index::*;
+pub use index_builder::*;
+pub use timestamp::*;
+pub use evidence_item_v1::*;
+pub use evidence_object_v1::*;

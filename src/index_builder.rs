@@ -8,6 +8,8 @@ use elasticsearch::{
 };
 use serde_json::Value;
 
+use crate::Index;
+
 pub struct IndexBuilder {
     host: Option<String>,
     port: Option<u16>,
@@ -72,7 +74,7 @@ impl IndexBuilder {
         self.client_has_index(&client).await
     }
 
-    pub async fn create_if_not_exists(&self) -> Result<()> {
+    pub async fn build(&self) -> Result<Index> {
         let client = self.create_client()?;
 
         if ! self.client_has_index(&client).await? {
@@ -84,7 +86,7 @@ impl IndexBuilder {
                 .await?;
             response.error_for_status_code_ref()?;
         }
-        Ok(())
+        Ok(Index::new(self.index_name.clone(), client))
     }
 
     fn create_client(&self) -> Result<Elasticsearch> {
