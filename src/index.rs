@@ -68,11 +68,12 @@ impl Index {
         Ok(())
     }
 
-    pub fn set_cache_size(&mut self, cache_size: usize) {
+    pub fn set_cache_size(&mut self, cache_size: usize) -> Result<()> {
         if self.cache_size > cache_size {
-            self.flush();
+            self.flush()?;
         }
         self.cache_size = cache_size;
+        Ok(())
     }
 
     pub fn cache_size(&self) -> usize {
