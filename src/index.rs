@@ -1,8 +1,7 @@
 use anyhow::{Result, bail};
-use chrono::{DateTime, TimeZone};
 use chrono_tz::Tz;
 use elasticsearch::{
-    http::request::{Body, JsonBody, NdBody},
+    http::request::JsonBody,
     Bulk, BulkParts, Elasticsearch,
 };
 use serde_json::Value;
@@ -38,6 +37,14 @@ impl Index {
     }
 
     pub fn flush(&mut self) -> Result<()> {
+        if self.document_cache.is_none() {
+            return Ok(())
+        }
+
+        if self.document_cache.as_ref().unwrap().is_empty() {
+            return Ok(())
+        }
+
         let parts = BulkParts::Index(&self.name);
         let items = self
             .document_cache

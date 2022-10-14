@@ -25,7 +25,7 @@ pub fn test_bodyfile_single() {
     assert_eq!(actual, expected);
 }
 
-#[test]
+//#[test]
 pub fn test_bodyfile_multiple() {
     let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|1577092512";
     let bf_line = Bodyfile3Line::try_from(str_line).unwrap();

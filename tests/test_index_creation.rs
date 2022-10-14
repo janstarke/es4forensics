@@ -11,10 +11,11 @@ async fn test_index_creation() -> Result<(), Box<dyn std::error::Error>> {
         .with_host("127.0.0.1")
         .with_port(9200)
         .without_certificate_validation()
-        .with_credentials(credentials)
-    ;
-        
-    if let Err(e) = builder.do_build().await { panic!("{e}") }
+        .with_credentials(credentials);
+
+    if let Err(e) = builder.do_build().await {
+        panic!("{e}")
+    }
 
     assert!(builder.do_index_exists().await?);
     Ok(())
