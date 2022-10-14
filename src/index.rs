@@ -1,5 +1,4 @@
 use anyhow::{Result, bail};
-use chrono_tz::Tz;
 use elasticsearch::{
     http::request::JsonBody,
     Bulk, BulkParts, Elasticsearch,
