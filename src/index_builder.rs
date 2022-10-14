@@ -69,12 +69,29 @@ impl IndexBuilder {
         &self.index_name
     }
 
-    pub async fn index_exists(&self) -> Result<bool> {
+    pub fn index_exists(&self) -> Result<bool> {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()?;
+        
+        rt.block_on(self.do_index_exists())
+    }
+
+    pub async fn do_index_exists(&self) -> Result<bool> {
         let client = self.create_client()?;
         self.client_has_index(&client).await
     }
 
-    pub async fn build(&self) -> Result<Index> {
+
+    pub fn build(&self) -> Result<Index> {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()?;
+        
+        rt.block_on(self.do_build())
+    }
+
+    pub async fn do_build(&self) -> Result<Index> {
         let client = self.create_client()?;
 
         if ! self.client_has_index(&client).await? {

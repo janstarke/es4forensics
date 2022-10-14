@@ -2,6 +2,11 @@
 name = "elastic4forensics"
 version = "0.1.0"
 edition = "2021"
+description = "Import several timelines into elasticsearch"
+homepage = "https://www.github.com/janstarke/tlnimport"
+repository = "https://www.github.com/janstarke/tlnimport"
+license = "GPL-3.0"
+
 
 [dependencies]
 # requires libssl-dev

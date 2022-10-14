@@ -4,17 +4,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::hash::Hash;
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Clone, Hash)]
 pub struct Timestamp {
     ts: i64,
     tz: String,
-}
-
-impl Hash for Timestamp {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.ts.hash(state);
-        self.tz.hash(state);
-    }
 }
 
 impl From<DateTime<Tz>> for Timestamp {

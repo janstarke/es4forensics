@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{EvidenceObjectV1, Timestamp, utils::json::add_to_json};
+use crate::{EvidenceObjectV1, utils::json::add_to_json};
 
 #[derive(Serialize, Deserialize)]
 pub struct EvidenceItemV1 {

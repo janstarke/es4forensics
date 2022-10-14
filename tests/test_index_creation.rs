@@ -14,8 +14,8 @@ async fn test_index_creation() -> Result<(), Box<dyn std::error::Error>> {
         .with_credentials(credentials)
     ;
         
-    if let Err(e) = builder.build().await { panic!("{e}") }
+    if let Err(e) = builder.do_build().await { panic!("{e}") }
 
-    assert!(builder.index_exists().await?);
+    assert!(builder.do_index_exists().await?);
     Ok(())
 }

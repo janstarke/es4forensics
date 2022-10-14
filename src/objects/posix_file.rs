@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use bodyfile::Bodyfile3Line;
 use serde::{Serialize, Deserialize};
-use serde_json::{Value, json};
+use serde_json::{Value};
 
-use crate::{Timestamp, utils::json::add_to_json, ecs::{File, ECS}};
+use crate::{Timestamp, ecs::{File, ECS}};
 
 #[derive(Serialize, Deserialize)]
 pub struct PosixFile {

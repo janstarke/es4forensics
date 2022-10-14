@@ -12,3 +12,4 @@ pub use index_builder::*;
 pub use timestamp::*;
 pub use evidence_item_v1::*;
 pub use evidence_object_v1::*;
+pub use ecs::*;
