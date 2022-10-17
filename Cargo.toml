@@ -19,5 +19,7 @@ futures = "0.3"
 tokio = { version = "*", features = ["full"] }
 chrono = "0.4"
 chrono-tz = "0.6"
+log = "0.4"
+sha2 = "0.10"
 
 bodyfile = "0.1"

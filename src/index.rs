@@ -1,16 +1,45 @@
-use anyhow::{Result, bail};
+use anyhow::{bail, Result};
 use elasticsearch::{
-    http::request::JsonBody,
-    Bulk, BulkParts, Elasticsearch,
+    http::request::JsonBody, Bulk, BulkCreateOperation, BulkOperation, BulkParts, Elasticsearch,
 };
 use serde_json::Value;
+use sha2::{Digest, Sha256};
+
+struct ElasticDocument {
+    id: String,
+    content: Value,
+}
+
+impl ElasticDocument {
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+}
+
+impl From<ElasticDocument> for (String, Value) {
+    fn from(me: ElasticDocument) -> Self {
+        (me.id, me.content)
+    }
+}
+
+impl From<Value> for ElasticDocument {
+    fn from(val: Value) -> Self {
+        let mut hasher = Sha256::new();
+        hasher.update(val.to_string());
+        let result = hasher.finalize();
+        Self {
+            id: format!("{:X}", result),
+            content: val,
+        }
+    }
+}
 
 pub struct Index {
     name: String,
     client: Elasticsearch,
 
     cache_size: usize,
-    document_cache: Option<Vec<Value>>,
+    document_cache: Option<Vec<ElasticDocument>>,
 }
 
 impl Index {
@@ -25,7 +54,7 @@ impl Index {
 
     pub fn add_bulk_document(&mut self, document: Value) -> Result<()> {
         if let Some(c) = self.document_cache.as_mut() {
-            c.push(document)
+            c.push(document.into())
         }
 
         if self.document_cache.as_ref().unwrap().len() >= self.cache_size {
@@ -36,33 +65,52 @@ impl Index {
     }
 
     pub fn flush(&mut self) -> Result<()> {
-        if self.document_cache.is_none() {
-            return Ok(())
-        }
+        log::info!("flushing document cache");
 
-        if self.document_cache.as_ref().unwrap().is_empty() {
-            return Ok(())
-        }
+        match self.document_cache.as_ref() {
+            None => log::trace!("There is no document cache"),
 
-        let parts = BulkParts::Index(&self.name);
-        let items = self
-            .document_cache
-            .replace(Vec::new())
-            .unwrap()
-            .into_iter()
-            .map(JsonBody::new)
-            .collect();
-        let bulk = Bulk::<JsonBody<Value>>::new(self.client.transport(), parts).body(items);
+            Some(document_cache) => {
+                if document_cache.is_empty() {
+                    log::trace!("Document cache is empty");
+                } else {
+                    let parts = BulkParts::Index(&self.name);
 
+                    let item_count = self.document_cache.as_ref().unwrap().len();
+                    let items: Vec<BulkOperation<Value>> = self
+                        .document_cache
+                        .replace(Vec::new())
+                        .unwrap()
+                        .into_iter()
+                        .map(|v| {
+                            let (id, val) = v.into();
+                            BulkOperation::create(id, val).into()
+                        })
+                        .collect();
+                    let bulk = self.client.bulk(parts).body(items);
+                    let rt = tokio::runtime::Builder::new_current_thread()
+                        .enable_all()
+                        .build()?;
 
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()?;
-        
-        let response = rt.block_on(bulk.send())?;
+                    let response = rt.block_on(bulk.send())?;
 
-        if ! response.status_code().is_success() {
-            bail!("error {} while sending response", response.status_code());
+                    if !response.status_code().is_success() {
+                        log::error!(
+                            "error {} while sending bulk operation",
+                            response.status_code()
+                        );
+                        log::error!("{}", rt.block_on(response.text()).unwrap());
+                        bail!("error while sending bulk operation");
+                    } else {
+                        let json: Value = rt.block_on(response.json()).unwrap();
+                        if json["errors"].as_bool().unwrap() {
+                            log::error!("error while writing to elasticsearch");
+                        } else {
+                            log::trace!("successfully wrote {item_count} items");
+                        }
+                    }
+                }
+            }
         }
         Ok(())
     }
