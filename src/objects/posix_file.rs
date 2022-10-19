@@ -1,10 +1,15 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use bodyfile::Bodyfile3Line;
-use serde::{Serialize, Deserialize};
-use serde_json::{Value};
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
 
-use crate::{Timestamp, ecs::{File, ECS}};
+use crate::{
+    ecs::ECS,
+    Timestamp,
+};
+
+use super::MACB;
 
 #[derive(Serialize, Deserialize)]
 pub struct PosixFile {
@@ -19,60 +24,88 @@ pub struct PosixFile {
     crtime: Option<Timestamp>,
 }
 
-impl From<&PosixFile> for File {
-    fn from(me: &PosixFile) -> Self {
-        let mut obj = Self::new(me.name.clone())
-            .with_inode(me.inode.clone())
-            .with_uid(me.uid)
-            .with_gid(me.gid)
-            .with_size(me.size)
-        ;
-        
-        if let Some(t) = me.atime.as_ref() { obj = obj.with_accessed(t.clone()); }
-        if let Some(t) = me.mtime.as_ref() { obj = obj.with_mtime(t.clone()); }
-        if let Some(t) = me.ctime.as_ref() { obj = obj.with_ctime(t.clone()); }
-        if let Some(t) = me.crtime.as_ref() { obj = obj.with_created(t.clone()); }
-        obj
+impl From<&PosixFile> for Value {
+    fn from(val: &PosixFile) -> Self {
+        let m: HashMap<&str, Value> = val.into();
+        json!(m)
+    }
+}
+
+impl From<&PosixFile> for HashMap<&str, Value> {
+    fn from(val: &PosixFile) -> Self {
+        let mut m = HashMap::from([
+            ("path", json!(val.name.clone())),
+            ("inode", json!(val.inode.clone())),
+            ("uid", json!(val.uid)),
+            ("gid", json!(val.gid)),
+            ("size", json!(val.size)),
+        ]);
+
+        val.mtime.as_ref().and_then(|t| {
+            m.insert("mtime", t.into())
+        });
+        val.atime.as_ref().and_then(|t| {
+            m.insert("accessed", t.into())
+        });
+        val.ctime.as_ref().and_then(|t| {
+            m.insert("ctime", t.into())
+        });
+        val.crtime.as_ref().and_then(|t| {
+            m.insert("created", t.into())
+        });
+        m
     }
 }
 
 impl PosixFile {
-    fn load_timestamp(ts: i64) -> Option<Timestamp> {
-        match ts {
-            0 | -1 => None,
-            _ => Some(ts.into())
-        }
-    }
-
-    pub fn documents(&self) -> impl Iterator<Item=Value> {
+    pub fn documents(&self) -> impl Iterator<Item = Value> {
         let mut docs = HashMap::new();
-
-        if let Some(atime) = self.atime.as_ref() {
-            docs.insert(atime.clone(), ECS::new(atime.clone()).with_file(self.into()).into());
-        }
-
-        if let Some(mtime) = self.mtime.as_ref() {
-            if ! docs.contains_key(mtime) {
-                docs.insert(mtime.clone(), ECS::new(mtime.clone()).with_file(self.into()).into());
-            }
-        }
-
-        if let Some(ctime) = self.ctime.as_ref() {
-            if ! docs.contains_key(ctime) {
-                docs.insert(ctime.clone(), ECS::new(ctime.clone()).with_file(self.into()).into());
-            }
-        }
-
-        if let Some(crtime) = self.crtime.as_ref() {
-            if ! docs.contains_key(crtime) {
-                docs.insert(crtime.clone(), ECS::new(crtime.clone()).with_file(self.into()).into());
-            }
-        }
-
+        self.add_document_to(&mut docs, &self.mtime);
+        self.add_document_to(&mut docs, &self.atime);
+        self.add_document_to(&mut docs, &self.ctime);
+        self.add_document_to(&mut docs, &self.crtime);
         docs.into_values()
     }
 
-    pub fn get_inode(&self) -> &str { &self.inode }
+    pub fn get_inode(&self) -> &str {
+        &self.inode
+    }
+
+    fn load_timestamp(ts: i64) -> Option<Timestamp> {
+        match ts {
+            0 | -1 => None,
+            _ => Some((ts * 1000).into()),
+        }
+    }
+
+    fn generate_macb(&self, reference_ts: &Timestamp) -> MACB {
+        let mut macb = MACB::default();
+
+        if let Some(t) = self.mtime.as_ref() {
+            macb.modified = t == reference_ts;
+        }
+        if let Some(t) = self.atime.as_ref(){
+            macb.accessed = t == reference_ts;
+        }
+        if let Some(t) = self.ctime.as_ref(){
+            macb.changed = t == reference_ts;
+        }
+        if let Some(t) = self.crtime.as_ref(){
+            macb.created = t == reference_ts;
+        }
+        
+        macb
+    }
+
+    fn add_document_to(&self, docs: &mut HashMap<Timestamp, Value>, ts: &Option<Timestamp>) {
+        if let Some(t) = ts.as_ref() {
+            let macb = self.generate_macb(t);
+            docs.insert(
+                t.clone(),
+                ECS::new(t.clone()).with_file(self).with_macb(&macb).with_additional_tag("bodyfile").into(),
+            );
+        }
+    }
 }
 
 impl From<Bodyfile3Line> for PosixFile {

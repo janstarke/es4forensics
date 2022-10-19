@@ -13,6 +13,7 @@ pub struct Timestamp {
 impl From<DateTime<Tz>> for Timestamp {
     fn from(d: DateTime<Tz>) -> Self {
         let ts = d.with_timezone(&Utc);
+        log::error!("converting {} to {}", d, ts.timestamp_millis());
         Self {
             ts: ts.timestamp_millis(),
             tz: d.timezone().to_string(),
@@ -28,6 +29,7 @@ impl From<i64> for Timestamp {
         }
     }
 }
+
 
 impl From<&Timestamp> for Value {
     fn from(ts: &Timestamp) -> Self {

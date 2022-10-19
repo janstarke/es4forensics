@@ -1,6 +1,7 @@
 use anyhow::{bail, Result};
+use base64::{encode_config, URL_SAFE_NO_PAD};
 use elasticsearch::{
-    http::request::JsonBody, Bulk, BulkCreateOperation, BulkOperation, BulkParts, Elasticsearch,
+    BulkOperation, BulkParts, Elasticsearch,
 };
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -28,7 +29,7 @@ impl From<Value> for ElasticDocument {
         hasher.update(val.to_string());
         let result = hasher.finalize();
         Self {
-            id: format!("{:X}", result),
+            id: encode_config(result, URL_SAFE_NO_PAD),
             content: val,
         }
     }
