@@ -1,3 +1,7 @@
+[![Crates.io](https://img.shields.io/crates/v/es4forensics)](https://crates.io/crates/es4forensics)
+![Crates.io](https://img.shields.io/crates/l/es4forensics)
+![Crates.io (latest)](https://img.shields.io/crates/dv/es4forensics)
+
 # es4forensics
 
 This crates provides structs and functions to insert timeline data into
