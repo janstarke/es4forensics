@@ -1,7 +1,8 @@
-use elastic4forensics::{IndexBuilder, WithHost};
+
+/* 
+use es4forensics::{IndexBuilder, WithHost};
 use elasticsearch::auth::Credentials;
 mod common;
-
 #[tokio::test]
 async fn test_index_creation() -> Result<(), Box<dyn std::error::Error>> {
     let username = common::credentials::username_from_env();
@@ -20,3 +21,4 @@ async fn test_index_creation() -> Result<(), Box<dyn std::error::Error>> {
     assert!(builder.do_index_exists().await?);
     Ok(())
 }
+*/

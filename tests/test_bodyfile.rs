@@ -1,5 +1,5 @@
 use bodyfile::Bodyfile3Line;
-use elastic4forensics::objects::PosixFile;
+use es4forensics::objects::{PosixFile, ElasticObject};
 use serde_json::{json, Value};
 
 #[test]
@@ -10,17 +10,22 @@ pub fn test_bodyfile_single() {
     let values: Vec<Value> = pfile.documents().collect();
     let actual = json!(values);
     let expected = json!([{
-    "@timestamp":1577092511,
+    "@timestamp":1577092511000_u64,
     "ecs":{"version":"1.0.0"},
+    "message": "/Users/Administrator ($FILE_NAME)",
+    "tags": ["bodyfile"],
     "file":{
-        "accessed":1577092511,
-        "ctime":1577092511,
+        "accessed":1577092511000_u64,
+        "ctime":1577092511000_u64,
         "gid":0,
         "inode":"93552-48-2",
-        "mtime":1577092511,
+        "mtime":1577092511000_u64,
         "path":"/Users/Administrator ($FILE_NAME)",
         "size":92,
-        "uid":0}
+        "uid":0,
+        "macb_long": ["modified", "accessed", "changed"],
+        "macb_short": "mac."
+        }
     }]);
     assert_eq!(actual, expected);
 }
@@ -33,29 +38,29 @@ pub fn test_bodyfile_multiple() {
     let values: Vec<Value> = pfile.documents().collect();
     let actual = json!(values);
     let expected = json!([{
-    "@timestamp":1577092511,
+    "@timestamp":1577092511000_u64,
     "ecs":{"version":"1.0.0"},
     "file":{
-        "accessed":1577092511,
-        "ctime":1577092511,
-        "created":1577092512,
+        "accessed":1577092511000_u64,
+        "ctime":1577092511000_u64,
+        "created":1577092512000_u64,
         "gid":0,
         "inode":"93552-48-2",
-        "mtime":1577092511,
+        "mtime":1577092511000_u64,
         "path":"/Users/Administrator ($FILE_NAME)",
         "size":92,
         "uid":0}
     },
     {
-        "@timestamp":1577092512,
+        "@timestamp":1577092512000_u64,
         "ecs":{"version":"1.0.0"},
         "file":{
-            "accessed":1577092511,
-            "ctime":1577092511,
-            "created":1577092512,
+            "accessed":1577092511000_u64,
+            "ctime":1577092511000_u64,
+            "created":1577092512000_u64,
             "gid":0,
             "inode":"93552-48-2",
-            "mtime":1577092511,
+            "mtime":1577092511000_u64,
             "path":"/Users/Administrator ($FILE_NAME)",
             "size":92,
             "uid":0}

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map};
 
 use bodyfile::Bodyfile3Line;
 use serde::{Deserialize, Serialize};
@@ -6,7 +6,7 @@ use serde_json::{json, Value};
 
 use crate::{ecs::ECS, Timestamp};
 
-use super::MACB;
+use super::{MACB, ElasticObject};
 
 #[derive(Serialize, Deserialize)]
 pub struct PosixFile {
@@ -50,8 +50,9 @@ impl From<&PosixFile> for HashMap<&str, Value> {
     }
 }
 
-impl PosixFile {
-    pub fn documents(&self) -> impl Iterator<Item = Value> {
+impl ElasticObject for PosixFile {
+    type DocsIter = hash_map::IntoValues<Timestamp, Value>;
+    fn documents(&self) -> Self::DocsIter {
         let mut docs = HashMap::new();
         self.add_document_to(&mut docs, &self.mtime);
         self.add_document_to(&mut docs, &self.atime);
@@ -59,7 +60,9 @@ impl PosixFile {
         self.add_document_to(&mut docs, &self.crtime);
         docs.into_values()
     }
+}
 
+impl PosixFile {
     pub fn get_inode(&self) -> &str {
         &self.inode
     }

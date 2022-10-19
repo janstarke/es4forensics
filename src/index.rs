@@ -6,15 +6,11 @@ use elasticsearch::{
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
+use crate::objects::ElasticObject;
+
 struct ElasticDocument {
     id: String,
     content: Value,
-}
-
-impl ElasticDocument {
-    pub fn id(&self) -> &str {
-        &self.id
-    }
 }
 
 impl From<ElasticDocument> for (String, Value) {
@@ -53,7 +49,14 @@ impl Index {
         }
     }
 
-    pub fn add_bulk_document(&mut self, document: Value) -> Result<()> {
+    pub fn add_timeline_object<Obj: ElasticObject>(&mut self, object: Obj) -> Result<()> {
+        for doc in object.documents() {
+            self.add_bulk_document(doc)?;
+        }
+        Ok(())
+    }
+
+    fn add_bulk_document(&mut self, document: Value) -> Result<()> {
         if let Some(c) = self.document_cache.as_mut() {
             c.push(document.into())
         }

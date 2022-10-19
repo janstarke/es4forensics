@@ -1,10 +1,10 @@
 [package]
-name = "elastic4forensics"
+name = "es4forensics"
 version = "0.1.0"
 edition = "2021"
 description = "Import several timelines into elasticsearch"
-homepage = "https://www.github.com/janstarke/tlnimport"
-repository = "https://www.github.com/janstarke/tlnimport"
+homepage = "https://www.github.com/janstarke/es4forensics"
+repository = "https://www.github.com/janstarke/es4forensics"
 license = "GPL-3.0"
 
 
