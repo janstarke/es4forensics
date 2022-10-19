@@ -101,30 +101,33 @@ impl IndexBuilder {
             let index_body = json!({
                 "mappings": {
                     "properties": {
-                        "timestamp": {
+                        "@timestamp": {
                             "type": "date",
                             "format": "epoch_millis"
                         },
-                    "file": {
-                        "properties": {
-                            "accessed": {
-                                "type": "date",
-                                "format": "epoch_millis"
-                            },
-                            "created": {
-                                "type": "date",
-                                "format": "epoch_millis"
-                            },
-                            "ctime": {
-                                "type": "date",
-                                "format": "epoch_millis"
-                            },
-                            "mtime": {
-                                "type": "date",
-                                "format": "epoch_millis"
-                            },
+                        "tags": {
+                            "type": "keyword"
+                        },
+                        "file": {
+                            "properties": {
+                                "accessed": {
+                                    "type": "date",
+                                    "format": "epoch_millis"
+                                },
+                                "created": {
+                                    "type": "date",
+                                    "format": "epoch_millis"
+                                },
+                                "ctime": {
+                                    "type": "date",
+                                    "format": "epoch_millis"
+                                },
+                                "mtime": {
+                                    "type": "date",
+                                    "format": "epoch_millis"
+                                },
+                            }
                         }
-                    }
                     }
                 }
             });

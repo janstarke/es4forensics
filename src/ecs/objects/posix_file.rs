@@ -1,13 +1,10 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use bodyfile::Bodyfile3Line;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::{
-    ecs::ECS,
-    Timestamp,
-};
+use crate::{ecs::ECS, Timestamp};
 
 use super::MACB;
 
@@ -41,18 +38,14 @@ impl From<&PosixFile> for HashMap<&str, Value> {
             ("size", json!(val.size)),
         ]);
 
-        val.mtime.as_ref().and_then(|t| {
-            m.insert("mtime", t.into())
-        });
-        val.atime.as_ref().and_then(|t| {
-            m.insert("accessed", t.into())
-        });
-        val.ctime.as_ref().and_then(|t| {
-            m.insert("ctime", t.into())
-        });
-        val.crtime.as_ref().and_then(|t| {
-            m.insert("created", t.into())
-        });
+        val.mtime.as_ref().and_then(|t| m.insert("mtime", t.into()));
+        val.atime
+            .as_ref()
+            .and_then(|t| m.insert("accessed", t.into()));
+        val.ctime.as_ref().and_then(|t| m.insert("ctime", t.into()));
+        val.crtime
+            .as_ref()
+            .and_then(|t| m.insert("created", t.into()));
         m
     }
 }
@@ -84,16 +77,16 @@ impl PosixFile {
         if let Some(t) = self.mtime.as_ref() {
             macb.modified = t == reference_ts;
         }
-        if let Some(t) = self.atime.as_ref(){
+        if let Some(t) = self.atime.as_ref() {
             macb.accessed = t == reference_ts;
         }
-        if let Some(t) = self.ctime.as_ref(){
+        if let Some(t) = self.ctime.as_ref() {
             macb.changed = t == reference_ts;
         }
-        if let Some(t) = self.crtime.as_ref(){
+        if let Some(t) = self.crtime.as_ref() {
             macb.created = t == reference_ts;
         }
-        
+
         macb
     }
 
@@ -102,7 +95,12 @@ impl PosixFile {
             let macb = self.generate_macb(t);
             docs.insert(
                 t.clone(),
-                ECS::new(t.clone()).with_file(self).with_macb(&macb).with_additional_tag("bodyfile").into(),
+                ECS::new(t.clone())
+                    .with_file(self)
+                    .with_macb(&macb)
+                    .with_additional_tag("bodyfile")
+                    .with_message(&self.name)
+                    .into(),
             );
         }
     }

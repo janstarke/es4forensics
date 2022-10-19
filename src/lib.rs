@@ -5,7 +5,6 @@ mod evidence_item_v1;
 mod evidence_object_v1;
 mod utils;
 mod ecs;
-pub mod objects;
 
 pub use index::*;
 pub use index_builder::*;

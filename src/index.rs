@@ -48,7 +48,7 @@ impl Index {
         Self {
             name,
             client,
-            cache_size: 1000,
+            cache_size: 10000,
             document_cache: Some(Vec::new()),
         }
     }
