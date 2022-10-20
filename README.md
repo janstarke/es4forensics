@@ -1,4 +1,5 @@
 [![Crates.io](https://img.shields.io/crates/v/es4forensics)](https://crates.io/crates/es4forensics)
+[![docs.rs](https://img.shields.io/docsrs/es4forensics)](https://docs.rs/crate/es4forensics)
 ![Crates.io](https://img.shields.io/crates/l/es4forensics)
 ![Crates.io (latest)](https://img.shields.io/crates/dv/es4forensics)
 
