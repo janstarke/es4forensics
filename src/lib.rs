@@ -37,6 +37,31 @@
 //! index.add_timeline_object(PosixFile::from(bf_line));
 //!# }
 //! ```
+//! 
+//! # Exporting documents in JSON format
+//! 
+//! Sometimes you might want to simply export your documents, instead of directly importing them into
+//! elasticsearch.
+//! 
+//! Keep in mind that one bodyfile line might contain multiple different timestamps (up to four),
+//! which yields up to four elasticsearch documents. Therefore, [`ecs::objects::ElasticObject::documents()`] returns an
+//! iterator over [`serde_json::Value`]
+//! 
+//! ```
+//! use bodyfile::Bodyfile3Line;
+//! use es4forensics::objects::PosixFile;
+//! use es4forensics::objects::ElasticObject;
+//!# use es4forensics::Index;
+//! 
+//!# fn foo(mut index: Index) {
+//! let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
+//! let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
+//! 
+//! for json_value in PosixFile::from(bf_line).documents() {
+//!     println!("{json_value}");
+//! }
+//!# }
+//! ```
 
 mod index;
 mod index_builder;
