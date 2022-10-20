@@ -1,13 +1,24 @@
 use std::collections::HashMap;
 
+use chrono::{DateTime, Utc};
+use derive_builder::Builder;
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
 
 use crate::{Timestamp, utils::json::add_to_json};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Builder)]
+#[builder(pattern = "mutable")]
 pub struct WindowsEvent {
-    
+    #[builder(pattern = "owned", setter(prefix="with"))]
+    event_record_id: u64,
+
+    #[serde(with="chrono::serde::ts_milliseconds")]
+    #[builder(pattern = "owned", setter(prefix="with"))]
+    timestamp: DateTime<Utc>,
+
+    #[builder(pattern = "owned", setter(prefix="with"))]
+    event_id: u64,
 }
 
 impl WindowsEvent {

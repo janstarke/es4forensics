@@ -1,24 +1,29 @@
 [package]
 name = "es4forensics"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Import several timelines into elasticsearch"
 homepage = "https://www.github.com/janstarke/es4forensics"
 repository = "https://www.github.com/janstarke/es4forensics"
 license = "GPL-3.0"
 
+[features]
+default = ["elastic"]
+elastic = ["elasticsearch", "tokio", "futures"]
 
 [dependencies]
 # requires libssl-dev
-elasticsearch = "8.4.0-alpha.1"
+elasticsearch = {version="8.4.0-alpha.1", optional=true}
+tokio = { version = "1", features = ["full"], optional=true }
+futures = {version="0.3", optional=true }
+
 duplicate = "0.4"
-serde = "~1"
+serde = {version="~1", features=["derive"]}
 serde_json = "~1"
 anyhow = "1"
-futures = "0.3"
-tokio = { version = "1", features = ["full"] }
-chrono = "0.4"
-chrono-tz = "0.6"
+derive_builder = "0.11"
+chrono = {version="0.4", features=["serde"] }
+chrono-tz = "0.7"
 log = "0.4"
 sha2 = "0.10"
 base64 = "0.13"
