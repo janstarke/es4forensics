@@ -5,7 +5,7 @@ use std::collections::{HashMap, HashSet};
 use duplicate::duplicate_item;
 use serde_json::{json, Value};
 
-use crate::Timestamp;
+use crate::timestamp::Timestamp;
 
 use self::objects::{PosixFile, MACB};
 

@@ -63,23 +63,17 @@
 //!# }
 //! ```
 
-#[cfg(feature="elastic")]
 mod index;
 
-#[cfg(feature="elastic")]
 mod index_builder;
 mod timestamp;
-mod evidence_item_v1;
-mod evidence_object_v1;
 mod utils;
 mod ecs;
+mod protocol;
 
-#[cfg(feature="elastic")]
 pub use index::*;
 
-#[cfg(feature="elastic")]
 pub use index_builder::*;
 pub use timestamp::*;
-pub use evidence_item_v1::*;
-pub use evidence_object_v1::*;
 pub use ecs::*;
+pub use protocol::*;

@@ -6,7 +6,7 @@ use elasticsearch::{
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
-use crate::objects::ElasticObject;
+use crate::ecs::objects::ElasticObject;
 
 struct ElasticDocument {
     id: String,

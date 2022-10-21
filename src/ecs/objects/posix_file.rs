@@ -4,7 +4,7 @@ use bodyfile::Bodyfile3Line;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::{ecs::ECS, Timestamp};
+use crate::{ecs::ECS, timestamp::Timestamp};
 
 use super::{MACB, ElasticObject};
 

@@ -1,26 +1,10 @@
-use std::fmt::Display;
-
-use clap::{Parser, ValueEnum};
-
-#[derive(ValueEnum, Clone)]
-pub enum Protocol {
-    Http,
-    Https,
-}
-
-impl Display for Protocol {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Protocol::Http => write!(f, "http"),
-            Protocol::Https => write!(f, "https"),
-        }
-    }
-}
+use clap::Parser;
+use crate::Protocol;
 
 #[derive(clap::Subcommand)]
-enum Action {
+pub (crate) enum Action {
     // create a new index
-    Create,
+    CreateIndex,
 
     // import timeline data
     Import {
@@ -34,7 +18,7 @@ enum Action {
 #[clap(author, version, about, long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
-    action: Action,
+    pub(crate) action: Action,
 
     /// strict mode: do not only warn, but abort if an error occurs
     #[clap(long("strict"), display_order(500))]
@@ -42,8 +26,7 @@ pub struct Cli {
 
     /// name of the elasticsearch index
     #[clap(long("index"), display_order = 800)]
-    #[cfg(feature = "elastic")]
-    pub(crate) index_name: Option<String>,
+    pub(crate) index_name: String,
 
     /// server name or IP address of elasticsearch server
     #[clap(
@@ -77,7 +60,7 @@ pub struct Cli {
 
     /// password for authenticating at elasticsearch
     #[clap(short('W'), long("password"), display_order = 860)]
-    pub(crate) password: Option<String>,
+    pub(crate) password: String,
 
     #[clap(flatten)]
     pub(crate) verbose: clap_verbosity_flag::Verbosity,

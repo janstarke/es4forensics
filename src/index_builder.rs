@@ -12,11 +12,12 @@ use elasticsearch::{
 };
 use serde_json::{json, Value};
 
-use crate::Index;
+use crate::{Protocol, index::Index};
 
 pub struct IndexBuilder {
     host: Option<String>,
     port: Option<u16>,
+    protocol: Protocol,
     index_name: String,
     do_certificate_validation: bool,
     credentials: Option<Credentials>,
@@ -34,6 +35,7 @@ impl IndexBuilder {
         Self {
             host: None,
             port: None,
+            protocol: Protocol::default(),
             index_name,
             do_certificate_validation: true,
             credentials: None,
@@ -42,6 +44,11 @@ impl IndexBuilder {
 
     pub fn with_port(mut self, port: u16) -> Self {
         self.port = Some(port);
+        self
+    }
+
+    pub fn with_protocol(mut self, protocol: Protocol) -> Self {
+        self.protocol = protocol;
         self
     }
 
@@ -193,7 +200,7 @@ impl IndexBuilder {
     }
 */
     fn create_client(&self) -> Result<Elasticsearch> {
-        let url = Url::parse(&format!("http://{}:{}", self.host(), self.port()))?;
+        let url = Url::parse(&format!("{}://{}:{}", self.protocol, self.host(), self.port()))?;
         let conn_pool = SingleNodeConnectionPool::new(url);
         let mut transport_builder = TransportBuilder::new(conn_pool)
             .cert_validation(if self.do_certificate_validation {
