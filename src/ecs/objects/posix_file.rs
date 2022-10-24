@@ -98,6 +98,7 @@ impl PosixFile {
     fn add_document_to(&self, docs: &mut HashMap<Timestamp, Value>, ts: &Option<Timestamp>) {
         if let Some(t) = ts.as_ref() {
             let macb = self.generate_macb(t);
+            assert!(! docs.contains_key(t));
             docs.insert(
                 t.clone(),
                 Ecs::new(t.clone())
