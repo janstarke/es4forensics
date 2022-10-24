@@ -6,7 +6,7 @@ use serde_json::{json, Value};
 pub fn test_bodyfile_single() {
     let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
     let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
-    let pfile = PosixFile::from(bf_line);
+    let pfile = PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap();
     let values: Vec<Value> = pfile.documents().collect();
     let actual = json!(values);
     let expected = json!([{
@@ -34,7 +34,7 @@ pub fn test_bodyfile_single() {
 pub fn test_bodyfile_multiple() {
     let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|1577092512";
     let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
-    let pfile = PosixFile::from(bf_line);
+    let pfile = PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap();
     let values: Vec<Value> = pfile.documents().collect();
     let actual = json!(values);
     let expected = json!([{

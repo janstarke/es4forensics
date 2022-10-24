@@ -59,7 +59,7 @@ impl Es4Forensics {
 
     async fn import(&self, builder: IndexBuilder, reader: Box<dyn BufRead + Send>, bulk_size: usize) -> Result<()> {
         let mut index = builder.connect().await?;
-        index.set_cache_size(bulk_size)?;
+        index.set_cache_size(bulk_size).await?;
 
         for line in reader.lines() {
             let line = line?;
@@ -76,8 +76,9 @@ impl Es4Forensics {
                 }
             };
 
-            index.add_bulk_document(value)?;
+            index.add_bulk_document(value).await?;
         }
+        index.flush().await?;
         Ok(())
     }    
 

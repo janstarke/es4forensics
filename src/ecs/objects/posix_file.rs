@@ -1,6 +1,8 @@
 use std::collections::{HashMap, hash_map};
+use anyhow::Result;
 
 use bodyfile::Bodyfile3Line;
+use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
@@ -67,10 +69,10 @@ impl PosixFile {
         &self.inode
     }
 
-    fn load_timestamp(ts: i64) -> Option<Timestamp> {
+    fn load_timestamp(ts: i64, tz: &Tz) -> Result<Option<Timestamp>> {
         match ts {
-            0 | -1 => None,
-            _ => Some((ts * 1000).into()),
+            -1 => Ok(None),
+            _ => Ok(Some((ts * 1000, tz).try_into()?)),
         }
     }
 
@@ -109,18 +111,36 @@ impl PosixFile {
     }
 }
 
-impl From<Bodyfile3Line> for PosixFile {
-    fn from(bfline: Bodyfile3Line) -> Self {
-        Self {
+impl TryFrom<(Bodyfile3Line, &Tz)> for PosixFile {
+    type Error = anyhow::Error;
+    fn try_from((bfline, src_tz): (Bodyfile3Line, &Tz)) -> Result<Self> {
+        Ok(Self {
             name: bfline.get_name().to_string(),
             inode: bfline.get_inode().to_string(),
             uid: bfline.get_uid(),
             gid: bfline.get_gid(),
             size: bfline.get_size(),
-            atime: Self::load_timestamp(bfline.get_atime()),
-            mtime: Self::load_timestamp(bfline.get_mtime()),
-            ctime: Self::load_timestamp(bfline.get_ctime()),
-            crtime: Self::load_timestamp(bfline.get_crtime()),
-        }
+            atime: Self::load_timestamp(bfline.get_atime(), src_tz)?,
+            mtime: Self::load_timestamp(bfline.get_mtime(), src_tz)?,
+            ctime: Self::load_timestamp(bfline.get_ctime(), src_tz)?,
+            crtime: Self::load_timestamp(bfline.get_crtime(), src_tz)?,
+        })
+    }
+}
+
+impl TryFrom<(&Bodyfile3Line, &Tz)> for PosixFile {
+    type Error = anyhow::Error;
+    fn try_from((bfline, src_tz): (&Bodyfile3Line, &Tz)) -> Result<Self> {
+        Ok(Self {
+            name: bfline.get_name().to_string(),
+            inode: bfline.get_inode().to_string(),
+            uid: bfline.get_uid(),
+            gid: bfline.get_gid(),
+            size: bfline.get_size(),
+            atime: Self::load_timestamp(bfline.get_atime(), src_tz)?,
+            mtime: Self::load_timestamp(bfline.get_mtime(), src_tz)?,
+            ctime: Self::load_timestamp(bfline.get_ctime(), src_tz)?,
+            crtime: Self::load_timestamp(bfline.get_crtime(), src_tz)?,
+        })
     }
 }
