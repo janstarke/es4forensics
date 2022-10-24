@@ -7,7 +7,7 @@ use serde_json::{json, Value};
 
 use crate::timestamp::Timestamp;
 
-use self::objects::{PosixFile, MACB};
+use self::objects::{PosixFile, Macb};
 
 //mod file;
 //pub use file::*;
@@ -16,16 +16,16 @@ pub trait ECSFields {
     fn into(&self) -> Value;
 }
 
-pub struct ECS<'a> {
+pub struct Ecs<'a> {
     ts: Timestamp,
     message: Option<String>,
     //labels: HashMap<String, String>,
     tags: HashSet<String>,
     file: Option<&'a PosixFile>,
-    macb: Option<&'a MACB>,
+    macb: Option<&'a Macb>,
 }
 
-impl<'a> ECS<'a> {
+impl<'a> Ecs<'a> {
     pub fn new(ts: Timestamp) -> Self {
         Self {
             ts,
@@ -50,7 +50,7 @@ impl<'a> ECS<'a> {
     #[duplicate_item(
         method            attribute    ret_type;
       [ with_file ] [ file ] [ PosixFile ];
-      [ with_macb ] [ macb ] [ MACB ];
+      [ with_macb ] [ macb ] [ Macb ];
     )]
     pub fn method(mut self, ts: &'a ret_type) -> Self {
         self.attribute = Some(ts);
@@ -58,8 +58,8 @@ impl<'a> ECS<'a> {
     }
 }
 
-impl From<ECS<'_>> for Value {
-    fn from(val: ECS) -> Value {
+impl From<Ecs<'_>> for Value {
+    fn from(val: Ecs) -> Value {
         let mut m = HashMap::from([
             ("@timestamp", Value::Number(val.ts.timestamp_millis().into())),
             ("ecs", json!({"version": "1.0.0"}))

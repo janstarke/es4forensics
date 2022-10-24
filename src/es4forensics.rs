@@ -1,4 +1,6 @@
-use anyhow::Result;
+use std::io::BufRead;
+
+use anyhow::{Result, anyhow};
 mod cli;
 mod index;
 
@@ -7,47 +9,101 @@ mod timestamp;
 mod utils;
 mod ecs;
 mod protocol;
+mod stream_source;
 
 use cli::{Cli, Action};
 use elasticsearch::auth::Credentials;
 use index_builder::*;
 pub (crate) use protocol::*;
 use clap::Parser;
+use simplelog::{TermLogger, Config, ColorChoice, TerminalMode};
+use stream_source::StreamSource;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    let builder = create_index_builder(&cli)?;
+    let _ = TermLogger::init(
+        cli.verbose.log_level_filter(),
+        Config::default(),
+        TerminalMode::Stderr,
+        ColorChoice::Auto);
+        
+    let e4f: Es4Forensics = cli.into();
+    e4f.run().await
+}
 
-    match &cli.action {
-        Action::CreateIndex => create_index(builder).await,
-        Action::Import{bulk_size} => import(builder, *bulk_size).await
+struct Es4Forensics {
+    cli: Cli
+}
+
+impl Es4Forensics {
+    pub async fn run(self) -> Result<()> {
+
+        let builder = self.create_index_builder()?;
+
+        match &self.cli.action {
+            Action::CreateIndex => {
+                if builder.index_exists().await? {
+                    return Err(anyhow!("index '{}' exists already", self.cli.index_name));
+                }
+                builder.create_index().await?;
+                Ok(())
+            }
+            Action::Import{input_file, bulk_size} => {
+                let source = StreamSource::from(input_file)?;
+                self.import(builder, source.into(), *bulk_size).await
+            }
+        }
+    }
+
+    async fn import(&self, builder: IndexBuilder, reader: Box<dyn BufRead + Send>, bulk_size: usize) -> Result<()> {
+        let mut index = builder.connect().await?;
+        index.set_cache_size(bulk_size)?;
+
+        for line in reader.lines() {
+            let line = line?;
+            let value = match serde_json::from_str(&line) {
+                Ok(v) => v,
+                Err(why) => {
+                    if self.cli.strict_mode {
+                        return Err(anyhow!(why))
+                    } else {
+                        log::error!("error while parsing: {}", why);
+                        log::error!("failed JSON was:     {}", line);
+                        continue;
+                    }
+                }
+            };
+
+            index.add_bulk_document(value)?;
+        }
+        Ok(())
+    }    
+
+    fn create_index_builder(&self) -> Result<IndexBuilder> {
+        let mut builder = IndexBuilder::with_name(self.cli.index_name.clone())
+            .with_host(self.cli.host.clone())
+            .with_port(self.cli.port)
+            .with_credentials(Credentials::Basic(
+                self.cli.username.clone(),
+                self.cli.password.clone(),
+            ))
+            .with_protocol(self.cli.protocol.clone());
+
+        if self.cli.omit_certificate_validation {
+            log::warn!("disabling certificate validation");
+            builder = builder.without_certificate_validation();
+        }
+
+        Ok(builder)
     }
 }
 
-async fn create_index(builder: IndexBuilder) -> Result<()> {
-    Ok(())
-}
-
-async fn import(builder: IndexBuilder, bulk_size: usize) -> Result<()> {
-    Ok(())
-}
-
-fn create_index_builder(cli: &Cli) -> Result<IndexBuilder> {
-    let mut builder = IndexBuilder::with_name(cli.index_name.clone())
-        .with_host(cli.host.clone())
-        .with_port(cli.port)
-        .with_credentials(Credentials::Basic(
-            cli.username.clone(),
-            cli.password.clone(),
-        ))
-        .with_protocol(cli.protocol.clone());
-
-    if cli.omit_certificate_validation {
-        log::warn!("disabling certificate validation");
-        builder = builder.without_certificate_validation();
+impl From<Cli> for Es4Forensics {
+    fn from(cli: Cli) -> Self {
+        Self {
+            cli
+        }
     }
-
-    Ok(builder)
 }

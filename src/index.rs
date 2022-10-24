@@ -48,7 +48,8 @@ impl Index {
             document_cache: Some(Vec::new()),
         }
     }
-
+    
+    #[allow(dead_code)]
     pub fn add_timeline_object<Obj: ElasticObject>(&mut self, object: Obj) -> Result<()> {
         for doc in object.documents() {
             self.add_bulk_document(doc)?;
@@ -56,7 +57,7 @@ impl Index {
         Ok(())
     }
 
-    fn add_bulk_document(&mut self, document: Value) -> Result<()> {
+    pub (crate) fn add_bulk_document(&mut self, document: Value) -> Result<()> {
         if let Some(c) = self.document_cache.as_mut() {
             c.push(document.into())
         }
@@ -125,10 +126,6 @@ impl Index {
         }
         self.cache_size = cache_size;
         Ok(())
-    }
-
-    pub fn cache_size(&self) -> usize {
-        self.cache_size
     }
 }
 

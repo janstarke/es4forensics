@@ -1,14 +1,14 @@
 
 #[derive(Default)]
-pub struct MACB {
+pub struct Macb {
     pub modified: bool,
     pub accessed: bool,
     pub changed: bool,
     pub created: bool,
 }
 
-impl From<&MACB> for String {
-    fn from(me: &MACB) -> Self {
+impl From<&Macb> for String {
+    fn from(me: &Macb) -> Self {
         let mut macb = ['.', '.', '.', '.'];
         if me.modified { macb[0] = 'm'; }
         if me.accessed { macb[1] = 'a'; }
@@ -19,8 +19,8 @@ impl From<&MACB> for String {
     }
 }
 
-impl From<&MACB> for Vec<&str> {
-    fn from(me: &MACB) -> Self {
+impl From<&Macb> for Vec<&str> {
+    fn from(me: &Macb) -> Self {
         let mut res = Vec::new();
         if me.modified { res.push("modified"); }
         if me.accessed { res.push("accessed"); }

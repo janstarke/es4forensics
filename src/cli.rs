@@ -1,6 +1,11 @@
 use clap::Parser;
 use crate::Protocol;
 
+#[cfg(feature = "gzip")]
+const INPUTFILE_HELP: &str = "path to input file or '-' for stdin (files ending with .gz will be treated as being gzipped)";
+#[cfg(not(feature = "gzip"))]
+const INPUTFILE_HELP: &str = "path to input file or '-' for stdin";
+
 #[derive(clap::Subcommand)]
 pub (crate) enum Action {
     // create a new index
@@ -8,6 +13,9 @@ pub (crate) enum Action {
 
     // import timeline data
     Import {
+        #[clap(default_value="-", help=INPUTFILE_HELP)]
+        input_file: String,
+
         /// number of timeline entries to combine in one bulk operation
         #[clap(long("bulk-size"), default_value_t=1000)]
         bulk_size: usize
@@ -25,7 +33,7 @@ pub struct Cli {
     pub(crate) strict_mode: bool,
 
     /// name of the elasticsearch index
-    #[clap(long("index"), display_order = 800)]
+    #[clap(short('I'), long("index"), display_order = 800)]
     pub(crate) index_name: String,
 
     /// server name or IP address of elasticsearch server

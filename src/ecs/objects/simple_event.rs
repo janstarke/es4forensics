@@ -11,6 +11,7 @@ pub struct SimpleEvent {
 }
 
 impl SimpleEvent {
+    #[allow(dead_code)]
     pub fn documents(&self) -> impl Iterator<Item=Value> {
         let docs: HashMap<Timestamp, Value> = HashMap::new();
         docs.into_iter().map(|(ts, v)| {

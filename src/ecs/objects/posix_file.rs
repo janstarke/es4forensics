@@ -4,9 +4,9 @@ use bodyfile::Bodyfile3Line;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::{ecs::ECS, timestamp::Timestamp};
+use crate::{ecs::Ecs, timestamp::Timestamp};
 
-use super::{MACB, ElasticObject};
+use super::{Macb, ElasticObject};
 
 #[derive(Serialize, Deserialize)]
 pub struct PosixFile {
@@ -74,8 +74,8 @@ impl PosixFile {
         }
     }
 
-    fn generate_macb(&self, reference_ts: &Timestamp) -> MACB {
-        let mut macb = MACB::default();
+    fn generate_macb(&self, reference_ts: &Timestamp) -> Macb {
+        let mut macb = Macb::default();
 
         if let Some(t) = self.mtime.as_ref() {
             macb.modified = t == reference_ts;
@@ -98,7 +98,7 @@ impl PosixFile {
             let macb = self.generate_macb(t);
             docs.insert(
                 t.clone(),
-                ECS::new(t.clone())
+                Ecs::new(t.clone())
                     .with_file(self)
                     .with_macb(&macb)
                     .with_additional_tag("bodyfile")

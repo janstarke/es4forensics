@@ -1,6 +1,6 @@
 [package]
 name = "es4forensics"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 description = "Import several timelines into elasticsearch"
 homepage = "https://www.github.com/janstarke/es4forensics"
@@ -14,8 +14,7 @@ cli = ["elasticsearch", "tokio", "clap", "clap-verbosity-flag"]
 [[bin]]
 name = "es4forensics"
 path = "src/es4forensics.rs"
-required_features=["cli"]
-about = "imports forensics data into elasticsearch"
+#required_features=["cli"]
 
 [dependencies]
 # requires libssl-dev
@@ -31,6 +30,7 @@ derive_builder = "0.11"
 chrono = {version="0.4", features=["serde"] }
 chrono-tz = "0.7"
 log = "0.4"
+simplelog = "0.12"
 sha2 = "0.10"
 base64 = "0.13"
 
