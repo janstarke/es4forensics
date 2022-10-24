@@ -76,32 +76,17 @@ impl IndexBuilder {
         }
     }
 
-    pub fn index_name(&self) -> &str {
-        &self.index_name
-    }
-
-    pub fn index_exists(&self) -> Result<bool> {
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()?;
-
-        rt.block_on(self.do_index_exists())
-    }
-
-    pub async fn do_index_exists(&self) -> Result<bool> {
+    pub async fn index_exists(&self) -> Result<bool> {
         let client = self.create_client()?;
         self.client_has_index(&client).await
     }
 
-    pub fn build(&self) -> Result<Index> {
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()?;
-
-        rt.block_on(self.do_build())
+    pub async fn connect(self) -> Result<Index> {
+        let client = self.create_client()?;
+        Ok(Index::new(self.index_name, client))
     }
 
-    pub async fn do_build(&self) -> Result<Index> {
+    pub async fn create_index(&self) -> Result<Index> {
         let client = self.create_client()?;
 
         if !self.client_has_index(&client).await? {
@@ -218,6 +203,8 @@ impl IndexBuilder {
     }
 
     async fn client_has_index(&self, client: &Elasticsearch) -> Result<bool> {
+        log::info!("test if index '{}' exists", self.index_name);
+
         let response = client
             .cat()
             .indices(CatIndicesParts::Index(&["*"]))
@@ -227,12 +214,16 @@ impl IndexBuilder {
         response.error_for_status_code_ref()?;
 
         if response.content_length().unwrap_or(0) == 0 {
+            log::debug!("empty result; index does not seem to exist");
             Ok(false)
         } else {
             let response_body = response.json::<Value>().await?;
 
             match response_body.as_array() {
-                None => Ok(false),
+                None => {
+                    log::debug!("index does not exist");
+                    Ok(false)
+                }
                 Some(body) => Ok(body
                     .iter()
                     .any(|r| *r["index"].as_str().unwrap() == self.index_name)),
