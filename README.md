@@ -8,6 +8,31 @@
 This crates provides structs and functions to insert timeline data into
 an elasticsearch index.
 
+# CLI Usage
+
+```
+Usage: es4forensics [OPTIONS] --index <INDEX_NAME> --password <PASSWORD> <COMMAND>
+
+Commands:
+  create-index  
+  import        
+  help          Print this message or the help of the given subcommand(s)
+
+Options:
+  -v, --verbose...           More output per occurrence
+  -q, --quiet...             Less output per occurrence
+      --strict               strict mode: do not only warn, but abort if an error occurs
+  -I, --index <INDEX_NAME>   name of the elasticsearch index
+  -H, --host <HOST>          server name or IP address of elasticsearch server [default: localhost]
+  -P, --port <PORT>          API port number of elasticsearch server [default: 9200]
+      --proto <PROTOCOL>     protocol to be used to connect to elasticsearch [default: https] [possible values: http, https]
+  -k, --insecure             omit certificate validation
+  -U, --username <USERNAME>  username for elasticsearch server [default: elastic]
+  -W, --password <PASSWORD>  password for authenticating at elasticsearch
+  -h, --help                 Print help information
+  -V, --version              Print version information
+```
+
 ## Creating Indices
 ```rust
 use es4forensics::IndexBuilder;
