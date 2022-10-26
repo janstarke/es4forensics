@@ -16,7 +16,9 @@ pub use ntfs_file::*;
 pub use simple_event::*;
 pub use macb::*;
 
+use crate::timestamp::Timestamp;
+
 pub trait ElasticObject {
-    type DocsIter: Iterator<Item = Value>;
+    type DocsIter: Iterator<Item = (Timestamp, Value)>;
     fn documents(&self) -> Self::DocsIter;
 }

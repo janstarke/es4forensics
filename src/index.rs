@@ -51,7 +51,7 @@ impl Index {
     
     #[allow(dead_code)]
     pub async fn add_timeline_object<Obj: ElasticObject>(&mut self, object: Obj) -> Result<()> {
-        for doc in object.documents() {
+        for (_ts, doc) in object.documents() {
             self.add_bulk_document(doc).await?;
         }
         Ok(())

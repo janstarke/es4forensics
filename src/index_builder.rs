@@ -90,6 +90,7 @@ impl IndexBuilder {
         let client = self.create_client()?;
 
         if !self.client_has_index(&client).await? {
+            log::info!("create index with mappings");
             let index_body = json!({
                 "mappings": {
                     "properties": {

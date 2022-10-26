@@ -5,7 +5,7 @@ use serde_json::{Value, json};
 use std::hash::Hash;
 use anyhow::{anyhow, Result};
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Clone, Hash)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Clone, Hash, PartialOrd, Ord)]
 pub struct Timestamp {
     ts: i64,
 }

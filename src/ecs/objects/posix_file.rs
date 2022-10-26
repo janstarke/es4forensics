@@ -53,14 +53,14 @@ impl From<&PosixFile> for HashMap<&str, Value> {
 }
 
 impl ElasticObject for PosixFile {
-    type DocsIter = hash_map::IntoValues<Timestamp, Value>;
+    type DocsIter = hash_map::IntoIter<Timestamp, Value>;
     fn documents(&self) -> Self::DocsIter {
         let mut docs = HashMap::new();
         self.add_document_to(&mut docs, &self.mtime);
         self.add_document_to(&mut docs, &self.atime);
         self.add_document_to(&mut docs, &self.ctime);
         self.add_document_to(&mut docs, &self.crtime);
-        docs.into_values()
+        docs.into_iter()
     }
 }
 
@@ -98,16 +98,17 @@ impl PosixFile {
     fn add_document_to(&self, docs: &mut HashMap<Timestamp, Value>, ts: &Option<Timestamp>) {
         if let Some(t) = ts.as_ref() {
             let macb = self.generate_macb(t);
-            assert!(! docs.contains_key(t));
-            docs.insert(
-                t.clone(),
-                Ecs::new(t.clone())
-                    .with_file(self)
-                    .with_macb(&macb)
-                    .with_additional_tag("bodyfile")
-                    .with_message(&self.name)
-                    .into(),
-            );
+            if ! docs.contains_key(t) {
+                docs.insert(
+                    t.clone(),
+                    Ecs::new(t.clone())
+                        .with_file(self)
+                        .with_macb(&macb)
+                        .with_additional_tag("bodyfile")
+                        .with_message(&self.name)
+                        .into(),
+                );
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 use bodyfile::Bodyfile3Line;
-use es4forensics::objects::{PosixFile, ElasticObject};
+use es4forensics::{objects::{PosixFile, ElasticObject}, Timestamp};
 use serde_json::{json, Value};
 
 #[test]
@@ -7,7 +7,7 @@ pub fn test_bodyfile_single() {
     let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
     let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
     let pfile = PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap();
-    let values: Vec<Value> = pfile.documents().collect();
+    let values: Vec<(Timestamp, Value)> = pfile.documents().collect();
     let actual = json!(values);
     let expected = json!([{
     "@timestamp":1577092511000_u64,
@@ -35,7 +35,7 @@ pub fn test_bodyfile_multiple() {
     let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|1577092512";
     let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
     let pfile = PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap();
-    let values: Vec<Value> = pfile.documents().collect();
+    let values: Vec<(Timestamp, Value)> = pfile.documents().collect();
     let actual = json!(values);
     let expected = json!([{
     "@timestamp":1577092511000_u64,
