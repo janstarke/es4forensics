@@ -119,6 +119,12 @@ impl IndexBuilder {
                                     "type": "date",
                                     "format": "epoch_millis"
                                 },
+                                "macb_short": {
+                                    "type": "keyword"
+                                },
+                                "macb_long": {
+                                    "type": "keyword"
+                                }
                             }
                         }
                     }
