@@ -105,7 +105,6 @@ impl Index {
                         bail!("error while sending bulk operation");
                     } else {
                         let json: Value = response.json().await?;
-                        log::trace!("successfully wrote {item_count} items");
                         if json["errors"].as_bool().unwrap() {
                             log::error!("error while writing to elasticsearch: {json}");
                         } else {

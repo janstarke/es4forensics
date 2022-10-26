@@ -28,3 +28,8 @@ services:
 networks:
   es-net:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.27.238.0/24
+          gateway: 172.27.238.1

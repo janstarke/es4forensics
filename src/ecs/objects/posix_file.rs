@@ -72,7 +72,9 @@ impl PosixFile {
     fn load_timestamp(ts: i64, tz: &Tz) -> Result<Option<Timestamp>> {
         match ts {
             -1 => Ok(None),
-            _ => Ok(Some((ts * 1000, tz).try_into()?)),
+            _ => {
+                Ok(Some((ts, tz).try_into()?))
+            }
         }
     }
 
