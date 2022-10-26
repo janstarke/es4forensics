@@ -7,7 +7,7 @@ use serde_json::{json, Value};
 
 use crate::timestamp::Timestamp;
 
-use self::objects::{PosixFile, Macb};
+use self::objects::{PosixFile, WindowsEvent, Macb};
 
 //mod file;
 //pub use file::*;
@@ -22,6 +22,7 @@ pub struct Ecs<'a> {
     //labels: HashMap<String, String>,
     tags: HashSet<String>,
     file: Option<&'a PosixFile>,
+    windows_event: Option<&'a WindowsEvent<'a>>,
     macb: Option<&'a Macb>,
 }
 
@@ -33,6 +34,7 @@ impl<'a> Ecs<'a> {
             //labels: HashMap::new(),
             tags: HashSet::new(),
             file: None,
+            windows_event: None,
             macb: None,
         }
     }
@@ -50,6 +52,7 @@ impl<'a> Ecs<'a> {
     #[duplicate_item(
         method            attribute    ret_type;
       [ with_file ] [ file ] [ PosixFile ];
+      [ with_windows_event ] [ windows_event ] [ WindowsEvent ];
       [ with_macb ] [ macb ] [ Macb ];
     )]
     pub fn method(mut self, ts: &'a ret_type) -> Self {
@@ -62,7 +65,7 @@ impl From<Ecs<'_>> for Value {
     fn from(val: Ecs) -> Value {
         let mut m = HashMap::from([
             ("@timestamp", Value::Number(val.ts.timestamp_millis().into())),
-            ("ecs", json!({"version": "1.0.0"}))
+            ("ecs", json!({"version": "8.4"}))
         ]);
 
         if let Some(message) = val.message {
@@ -83,6 +86,10 @@ impl From<Ecs<'_>> for Value {
             }
 
             m.insert("file", json!(file_map));
+        }
+
+        if let Some(event) = val.windows_event {
+            m.insert("event", event.into());
         }
 
         json!(m)

@@ -10,10 +10,10 @@ pub struct Timestamp {
     ts: i64,
 }
 
-impl From<DateTime<Tz>> for Timestamp {
+impl<Tz> From<DateTime<Tz>> for Timestamp where Tz: TimeZone {
     fn from(d: DateTime<Tz>) -> Self {
         let ts = d.with_timezone(&Utc);
-        log::error!("converting {} to {}", d, ts.timestamp_millis());
+        log::trace!("converting {:?} to {}", d, ts.timestamp_millis());
         Self {
             ts: ts.timestamp_millis(),
         }
