@@ -33,6 +33,8 @@ log = "0.4"
 simplelog = "0.12"
 sha2 = "0.10"
 base64 = "0.13"
+num-traits = "0.2"
+num-derive = "0.3"
 
 bodyfile = "0.1"
 clap = {version = "4", optional=true, features=["wrap_help", "cargo"]}

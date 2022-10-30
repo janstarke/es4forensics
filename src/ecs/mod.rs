@@ -89,7 +89,7 @@ impl From<Ecs<'_>> for Value {
         }
 
         if let Some(event) = val.windows_event {
-            m.insert("event", event.into());
+            m.extend(event);
         }
 
         json!(m)
