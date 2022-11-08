@@ -1,13 +1,21 @@
 use chrono::{DateTime, Utc, TimeZone, NaiveDateTime, LocalResult};
 use chrono_tz::Tz;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::{Value, json};
 use std::hash::Hash;
 use anyhow::{anyhow, Result};
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Clone, Hash, PartialOrd, Ord)]
+#[derive(Eq, PartialEq, Clone, Hash, PartialOrd, Ord)]
 pub struct Timestamp {
     ts: i64,
+}
+
+impl Serialize for Timestamp {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer {
+        serializer.serialize_i64(self.ts)
+    }
 }
 
 impl<Tz> From<DateTime<Tz>> for Timestamp where Tz: TimeZone {

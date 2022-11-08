@@ -64,7 +64,7 @@ impl<'a> WindowsEvent<'a> {
         let log =
             Log::default().with_syslog(Syslog::default().with_severity(Severity::from(self.level)));
 
-        EcsBuilder::with(self.timestamp.into())
+        EcsBuilder::new(format!("{}: {}", self.channel_name, self.event_id), self.timestamp.into())
             .with_event(event)?
             .with_host(host)?
             .with_log(log)

@@ -1,5 +1,6 @@
+use assert_json_diff::assert_json_eq;
 use bodyfile::Bodyfile3Line;
-use es4forensics::{objects::PosixFile};
+use es4forensics::{objects::PosixFile, FileType};
 use serde_json::{json, Value};
 
 #[test]
@@ -15,7 +16,7 @@ pub fn test_bodyfile_single() {
     let actual = json!(values);
     let expected = json!([{
     "@timestamp":1577092511000_u64,
-    "ecs":{"version":"1.0.0"},
+    "ecs":{"version":"8.4"},
     "message": "/Users/Administrator ($FILE_NAME)",
     "tags": ["bodyfile"],
     "file":{
@@ -25,13 +26,16 @@ pub fn test_bodyfile_single() {
         "inode":"93552-48-2",
         "mtime":1577092511000_u64,
         "path":"/Users/Administrator ($FILE_NAME)",
+        "name":"Administrator ($FILE_NAME)",
+        "directory":"/Users",
+        "mode": "",
         "size":92,
         "uid":0,
-        "macb_long": ["modified", "accessed", "changed"],
-        "macb_short": "mac."
+        //"macb_long": ["modified", "accessed", "changed"],
+        //"macb_short": "mac."
         }
     }]);
-    assert_eq!(actual, expected);
+    assert_json_eq!(actual, expected);
 }
 
 //#[test]
@@ -47,7 +51,7 @@ pub fn test_bodyfile_multiple() {
     let actual = json!(values);
     let expected = json!([{
     "@timestamp":1577092511000_u64,
-    "ecs":{"version":"1.0.0"},
+    "ecs":{"version":"8.4"},
     "file":{
         "accessed":1577092511000_u64,
         "ctime":1577092511000_u64,
@@ -73,5 +77,5 @@ pub fn test_bodyfile_multiple() {
             "size":92,
             "uid":0}
     }]);
-    assert_eq!(actual, expected);
+    assert_json_eq!(actual, expected);
 }

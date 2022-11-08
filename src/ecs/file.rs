@@ -16,22 +16,39 @@ pub enum FileType {
 
 #[derive(Serialize, Default)]
 pub struct File {
+    #[serde(skip_serializing_if = "Option::is_none")]
     mtime: Option<Timestamp>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     accessed: Option<Timestamp>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     ctime: Option<Timestamp>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     created: Option<Timestamp>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     directory: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     extension: Option<String>,
     gid: u64,
     uid: u64,
     inode: String,
     mode: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     path: Option<String>,
     size: u64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     target_path: Option<String>,
 
-    #[serde(rename = "type")]
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
     file_type: Option<FileType>,
 }
 

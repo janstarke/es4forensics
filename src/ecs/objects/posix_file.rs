@@ -3,12 +3,12 @@ use anyhow::Result;
 
 use bodyfile::Bodyfile3Line;
 use chrono_tz::Tz;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::{timestamp::Timestamp, ecs::{timeline_object::TimelineObject, ecs_builder::EcsBuilder}};
 use crate::ecs::File;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 pub struct PosixFile {
     name: String,
     inode: String,
@@ -61,7 +61,8 @@ impl PosixFile {
                     .with_accessed(self.atime.clone())
                     .with_ctime(self.ctime.clone())
                     .with_created(self.crtime.clone());
-                let builder = EcsBuilder::with(t.clone())
+                let builder = EcsBuilder::new(self.name.clone(), t.clone())
+                    .with_additional_tag("bodyfile")
                     .with_file(file);
                 docs.insert(t.clone(), builder);
             }

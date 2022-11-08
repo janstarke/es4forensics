@@ -10,7 +10,7 @@ use crate::timestamp::Timestamp;
 
 pub struct EcsBuilder {
     ts: Timestamp,
-    message: Option<String>,
+    message: String,
     //labels: HashMap<String, String>,
     tags: HashSet<String>,
     contents: HashMap<&'static str, Value>
@@ -18,10 +18,10 @@ pub struct EcsBuilder {
 
 impl EcsBuilder {
 
-    pub fn with(ts: Timestamp) -> Self {
+    pub fn new(message: String, ts: Timestamp) -> Self {
         Self {
             ts,
-            message: None,
+            message,
             tags: HashSet::default(),
             contents: HashMap::default()
         }
@@ -29,11 +29,6 @@ impl EcsBuilder {
 
     pub fn with_additional_tag(mut self, tag: &str) -> Self {
         self.tags.insert(tag.to_owned());
-        self
-    }
-
-    pub fn with_message(mut self, message: &str) -> Self {
-        self.message = Some(message.to_owned());
         self
     }
 
@@ -61,11 +56,8 @@ impl From<EcsBuilder> for Value {
                 Value::Number(val.ts.timestamp_millis().into()),
             ),
             ("ecs", json!({"version": "8.4"})),
+            ("message", json!(val.message))
         ]);
-
-        if let Some(message) = val.message {
-            m.insert("message", json!(message));
-        }
 
         if !val.tags.is_empty() {
             m.insert("tags", json!(val.tags));
