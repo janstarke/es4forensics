@@ -6,7 +6,7 @@ use elasticsearch::{
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
-use crate::ecs::objects::ElasticObject;
+use crate::ecs::TimelineObject;
 
 struct ElasticDocument {
     id: String,
@@ -50,9 +50,16 @@ impl Index {
     }
     
     #[allow(dead_code)]
-    pub async fn add_timeline_object<Obj: ElasticObject>(&mut self, object: Obj) -> Result<()> {
-        for (_ts, doc) in object.documents() {
-            self.add_bulk_document(doc).await?;
+    pub async fn add_timeline_object<Obj>(&mut self, object: Obj) -> Result<()> where Obj: TimelineObject {
+        for builder_res in object {
+            match builder_res {
+                Err(why) => {
+                    log::error!("Error while creating JSON value: {why}")
+                }
+                Ok(builder) => {
+                    self.add_bulk_document(builder.into()).await?;
+                }
+            }
         }
         Ok(())
     }

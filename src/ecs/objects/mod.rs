@@ -1,5 +1,3 @@
-use serde_json::Value;
-
 mod ad_object;
 mod registry_key;
 mod windows_event;
@@ -15,10 +13,3 @@ pub use posix_file::*;
 pub use ntfs_file::*;
 pub use simple_event::*;
 pub use macb::*;
-
-use crate::timestamp::Timestamp;
-
-pub trait ElasticObject {
-    type DocsIter: Iterator<Item = (Timestamp, Value)>;
-    fn documents(&self) -> Self::DocsIter;
-}
