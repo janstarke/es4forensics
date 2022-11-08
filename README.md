@@ -47,7 +47,7 @@ let mut index = IndexBuilder::with_name("elastic4forensics_test".to_string())
     .with_port(9200)
     .without_certificate_validation()
     .with_credentials(credentials)
-    .build();
+    .create_index().await;
 ```
 After doing this, you can easily add documents to the index using [`Index::add_timeline_object`]
 
@@ -63,7 +63,7 @@ use es4forensics::objects::PosixFile;
 let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
 let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
 
-index.add_timeline_object(PosixFile::from(bf_line));
+index.add_timeline_object(PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap());
 ```
 
 ## Exporting documents in JSON format
@@ -78,12 +78,13 @@ iterator over [`serde_json::Value`]
 ```rust
 use bodyfile::Bodyfile3Line;
 use es4forensics::objects::PosixFile;
-use es4forensics::objects::ElasticObject;
+use serde_json::Value;
 
 let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
 let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
 
-for json_value in PosixFile::from(bf_line).documents() {
+for builder in PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap().into_iter().filter_map(|r| r.ok()) {
+    let json_value: Value = builder.into();
     println!("{json_value}");
 }
 ```
