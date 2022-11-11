@@ -1,6 +1,6 @@
 [package]
 name = "es4forensics"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 description = "Import several timelines into elasticsearch"
 homepage = "https://www.github.com/janstarke/es4forensics"

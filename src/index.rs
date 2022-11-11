@@ -57,7 +57,8 @@ impl Index {
                     log::error!("Error while creating JSON value: {why}")
                 }
                 Ok(builder) => {
-                    self.add_bulk_document(builder.into()).await?;
+                    let (_, value) = builder.into();
+                    self.add_bulk_document(value).await?;
                 }
             }
         }

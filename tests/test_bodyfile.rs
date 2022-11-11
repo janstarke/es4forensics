@@ -1,6 +1,6 @@
 use assert_json_diff::assert_json_eq;
 use bodyfile::Bodyfile3Line;
-use es4forensics::{objects::PosixFile, FileType};
+use es4forensics::{objects::PosixFile};
 use serde_json::{json, Value};
 
 #[test]
@@ -11,7 +11,7 @@ pub fn test_bodyfile_single() {
     let values: Vec<Value> = pfile
         .into_iter()
         .filter_map(|b| b.ok())
-        .map(|b| b.into())
+        .map(|b| {let (_, v) = b.into(); v} )
         .collect();
     let actual = json!(values);
     let expected = json!([{
@@ -46,7 +46,7 @@ pub fn test_bodyfile_multiple() {
     let values: Vec<Value> = pfile
         .into_iter()
         .filter_map(|b| b.ok())
-        .map(|b| b.into())
+        .map(|b| {let (_, v) = b.into(); v})
         .collect();
     let actual = json!(values);
     let expected = json!([{

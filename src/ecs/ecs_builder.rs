@@ -48,8 +48,8 @@ impl EcsBuilder {
     }
 }
 
-impl From<EcsBuilder> for Value {
-    fn from(val: EcsBuilder) -> Value {
+impl From<EcsBuilder> for (Timestamp, Value) {
+    fn from(val: EcsBuilder) -> (Timestamp, Value) {
         let mut m = HashMap::from([
             (
                 "@timestamp",
@@ -66,7 +66,7 @@ impl From<EcsBuilder> for Value {
         for (key, value) in val.contents.into_iter() {
             m.insert(key, value);
         }
-        json!(m)
+        (val.ts, json!(m))
 
     }
 }

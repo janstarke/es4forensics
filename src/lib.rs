@@ -53,6 +53,7 @@
 //! ```
 //! use bodyfile::Bodyfile3Line;
 //! use es4forensics::objects::PosixFile;
+//! use es4forensics::Timestamp;
 //! use serde_json::Value;
 //!# use es4forensics::Index;
 //! 
@@ -61,7 +62,7 @@
 //! let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
 //! 
 //! for builder in PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap().into_iter().filter_map(|r| r.ok()) {
-//!     let json_value: Value = builder.into();
+//!     let (_, json_value): (Timestamp, Value) = builder.into();
 //!     println!("{json_value}");
 //! }
 //!# }
