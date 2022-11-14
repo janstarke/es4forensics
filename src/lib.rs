@@ -54,6 +54,7 @@
 //! use bodyfile::Bodyfile3Line;
 //! use es4forensics::objects::PosixFile;
 //! use es4forensics::Timestamp;
+//! use crate::es4forensics::TimelineObject;
 //! use serde_json::Value;
 //!# use es4forensics::Index;
 //! 
@@ -61,8 +62,7 @@
 //! let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
 //! let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
 //! 
-//! for builder in PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap().into_iter().filter_map(|r| r.ok()) {
-//!     let (_, json_value): (Timestamp, Value) = builder.into();
+//! for json_value in PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap().into_values() {
 //!     println!("{json_value}");
 //! }
 //!# }
