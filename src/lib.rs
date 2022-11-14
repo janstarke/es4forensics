@@ -68,17 +68,25 @@
 //!# }
 //! ```
 
+#[cfg(feature="elasticsearch")]
 mod index;
 
+#[cfg(feature="elasticsearch")]
 mod index_builder;
+
 mod timestamp;
 mod utils;
 mod ecs;
+
+#[cfg(feature="cli")]
 mod protocol;
 
+#[cfg(feature="elasticsearch")]
 pub use index::*;
 
+#[cfg(feature="elasticsearch")]
 pub use index_builder::*;
 pub use timestamp::*;
 pub use ecs::*;
+#[cfg(feature="cli")]
 pub use protocol::*;

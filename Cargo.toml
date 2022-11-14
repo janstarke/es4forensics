@@ -1,6 +1,6 @@
 [package]
 name = "es4forensics"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 description = "Import several timelines into elasticsearch"
 homepage = "https://www.github.com/janstarke/es4forensics"
@@ -11,10 +11,14 @@ license = "GPL-3.0"
 default = ["cli"]
 cli = ["elasticsearch", "tokio", "clap", "clap-verbosity-flag"]
 
+[lib]
+name="es4forensics"
+path="src/lib.rs"
+
 [[bin]]
 name = "es4forensics"
 path = "src/es4forensics.rs"
-#required_features=["cli"]
+required_features=["cli"]
 
 [dependencies]
 # requires libssl-dev
@@ -38,9 +42,10 @@ num-derive = "0.3"
 strum = { version = "0.24", features = ["derive"] }
 strum_macros = "0.24"
 
-bodyfile = "0.1"
 clap = {version = "4", optional=true, features=["wrap_help", "cargo"]}
 clap-verbosity-flag = {version = "2.0.0", optional=true }
+
+bodyfile = "0.1"
 
 [dev-dependencies]
 assert-json-diff = "2.0"

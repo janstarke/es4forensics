@@ -1,9 +1,5 @@
-use std::io::BufRead;
-
-use anyhow::{Result, anyhow};
 mod cli;
 mod index;
-
 mod index_builder;
 mod timestamp;
 mod utils;
@@ -11,13 +7,16 @@ mod ecs;
 mod protocol;
 mod stream_source;
 
+use std::io::BufRead;
+use anyhow::{Result, anyhow};
+
 use cli::{Cli, Action};
 use elasticsearch::auth::Credentials;
 use index_builder::*;
-pub (crate) use protocol::*;
+use protocol::*;
+use stream_source::StreamSource;
 use clap::Parser;
 use simplelog::{TermLogger, Config, ColorChoice, TerminalMode};
-use stream_source::StreamSource;
 
 #[tokio::main]
 async fn main() -> Result<()> {

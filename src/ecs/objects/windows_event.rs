@@ -25,6 +25,7 @@ pub struct WindowsEvent<'a> {
 
 impl<'a> WindowsEvent<'a> {
     #[allow(clippy::too_many_arguments)]
+    #[allow(dead_code)]
     pub fn new(
         event_record_id: u64,
         timestamp: DateTime<Utc>,
