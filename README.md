@@ -57,13 +57,12 @@ For example, consider we have a line from a bodyfile. We need to convert this
 into a [`ecs::objects::PosixFile`]-Object, which can then be added to an Index:
 
 ```rust
-use bodyfile::Bodyfile3Line;
 use es4forensics::objects::PosixFile;
 
 let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
-let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
+let posix_file: PosixFile = str_line.try_into().unwrap();
 
-index.add_timeline_object(PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap());
+index.add_timeline_object(posix_file);
 ```
 
 ## Exporting documents in JSON format
@@ -76,15 +75,15 @@ which yields up to four elasticsearch documents. Therefore, [`ecs::objects::Elas
 iterator over [`serde_json::Value`]
 
 ```rust
-use bodyfile::Bodyfile3Line;
 use es4forensics::objects::PosixFile;
+use es4forensics::Timestamp;
+use crate::es4forensics::TimelineObject;
 use serde_json::Value;
 
 let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
-let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
+let posix_file: PosixFile = str_line.try_into().unwrap();
 
-for builder in PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap().into_iter().filter_map(|r| r.ok()) {
-    let json_value: Value = builder.into();
+for json_value in posix_file.into_values() {
     println!("{json_value}");
 }
 ```

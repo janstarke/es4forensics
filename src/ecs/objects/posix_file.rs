@@ -93,6 +93,22 @@ impl TryFrom<(Bodyfile3Line, &Tz)> for PosixFile {
     }
 }
 
+impl TryFrom<Bodyfile3Line> for PosixFile {
+    type Error = anyhow::Error;
+    fn try_from(bfline: Bodyfile3Line) -> Result<Self> {
+        let src_tz = Tz::UTC;
+        Self::try_from((&bfline, &src_tz))
+    }
+}
+
+impl TryFrom<&Bodyfile3Line> for PosixFile {
+    type Error = anyhow::Error;
+    fn try_from(bfline: &Bodyfile3Line) -> Result<Self> {
+        let src_tz = Tz::UTC;
+        Self::try_from((bfline, &src_tz))
+    }
+}
+
 impl TryFrom<(&Bodyfile3Line, &Tz)> for PosixFile {
     type Error = anyhow::Error;
     fn try_from((bfline, src_tz): (&Bodyfile3Line, &Tz)) -> Result<Self> {
@@ -107,5 +123,14 @@ impl TryFrom<(&Bodyfile3Line, &Tz)> for PosixFile {
             ctime: Self::load_timestamp(bfline.get_ctime(), src_tz)?,
             crtime: Self::load_timestamp(bfline.get_crtime(), src_tz)?,
         })
+    }
+}
+
+impl TryFrom<&str> for PosixFile {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let bfline: Bodyfile3Line = value.try_into()?;
+        bfline.try_into()
     }
 }

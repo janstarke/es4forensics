@@ -29,15 +29,14 @@
 //! into a [`ecs::objects::PosixFile`]-Object, which can then be added to an Index:
 //! 
 //! ```
-//! use bodyfile::Bodyfile3Line;
 //! use es4forensics::objects::PosixFile;
 //!# use es4forensics::Index;
 //! 
 //!# fn foo(mut index: Index) {
 //! let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
-//! let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
+//! let posix_file: PosixFile = str_line.try_into().unwrap();
 //! 
-//! index.add_timeline_object(PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap());
+//! index.add_timeline_object(posix_file);
 //!# }
 //! ```
 //! 
@@ -51,7 +50,6 @@
 //! iterator over [`serde_json::Value`]
 //! 
 //! ```
-//! use bodyfile::Bodyfile3Line;
 //! use es4forensics::objects::PosixFile;
 //! use es4forensics::Timestamp;
 //! use crate::es4forensics::TimelineObject;
@@ -60,9 +58,9 @@
 //! 
 //!# fn foo(mut index: Index) {
 //! let str_line = "0|/Users/Administrator ($FILE_NAME)|93552-48-2|d/drwxrwxrwx|0|0|92|1577092511|1577092511|1577092511|-1";
-//! let bf_line = Bodyfile3Line::try_from(str_line).unwrap();
+//! let posix_file: PosixFile = str_line.try_into().unwrap();
 //! 
-//! for json_value in PosixFile::try_from((bf_line, &chrono_tz::UTC)).unwrap().into_values() {
+//! for json_value in posix_file.into_values() {
 //!     println!("{json_value}");
 //! }
 //!# }
