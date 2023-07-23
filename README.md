@@ -5,6 +5,13 @@
 
 # es4forensics
 
+
+> **Warning**
+> This Repository has been moved to <https://github.com/janstarke/dfir-toolkit>
+>
+> You can install the tools by running `cargo install dfir-toolkit`
+> 
+
 This crates provides structs and functions to insert timeline data into
 an elasticsearch index.
 
